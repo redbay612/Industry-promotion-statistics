@@ -3,194 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 同業動態全自動監測</title>
+    <title>同業市場情報 AI 監測 V8</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f9; --success: #27ae60; --ai-purple: #8e44ad; }
-        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --success: #27ae60; --ai-purple: #8e44ad; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* Top Navigation */
+        /* 導航列 */
         .top-nav { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area h1 { margin: 0; font-size: 20px; display: flex; align-items: center; gap: 10px; }
-        .main-controls { display: flex; gap: 12px; }
+        .main-controls { display: flex; gap: 10px; }
 
-        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
         
-        /* Grid System */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.2s; border: 1px solid #eef2f6; }
-        .card:hover { transform: translateY(-5px); }
-        
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
-        .comp-info h3 { margin: 0; font-size: 18px; color: var(--primary); }
-        .visit-link { font-size: 12px; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 2px 8px; border-radius: 4px; }
-        .visit-link:hover { background: var(--accent); color: white; }
+        /* 業者看板 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 5px solid #ddd; transition: 0.3s; }
+        .card.scanning { border-top-color: var(--ai-purple); opacity: 0.6; }
+        .card.success { border-top-color: var(--success); }
 
-        /* Content Areas */
-        .content-label { font-size: 12px; font-weight: bold; color: #95a5a6; margin: 15px 0 5px; display: block; text-transform: uppercase; }
-        textarea { width: 100%; border: 1px solid #e0e6ed; border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.6; box-sizing: border-box; background: #fdfdfd; resize: vertical; min-height: 80px; }
-        textarea:focus { border-color: var(--ai-purple); outline: none; background: white; box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-title { font-weight: bold; font-size: 17px; color: var(--primary); }
 
-        /* Status & Buttons */
-        .btn { border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .btn-ai-all { background: var(--ai-purple); color: white; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3); }
-        .btn-ai-all:hover { background: #732d91; transform: scale(1.05); }
+        textarea { width: 100%; border: 1px solid #e0e6ed; border-radius: 6px; padding: 10px; font-size: 13px; min-height: 90px; margin-top: 8px; box-sizing: border-box; background: #fafafa; line-height: 1.6; }
+        .label-text { font-size: 11px; color: #7f8c8d; font-weight: bold; margin-top: 12px; display: block; }
+
+        /* 按鈕樣式 */
+        .btn { border: none; border-radius: 6px; padding: 10px 18px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .btn-ai { background: var(--ai-purple); color: white; }
+        .btn-excel { background: #1d6f42; color: white; } /* Excel 綠 */
         .btn-save { background: var(--success); color: white; }
-        .status-bar { font-size: 11px; margin-top: 10px; color: #bdc3c7; display: flex; justify-content: space-between; }
 
-        /* Scanning Animation */
-        .scanning { position: relative; overflow: hidden; }
-        .scanning::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: var(--ai-purple); animation: scan 2s infinite; }
-        @keyframes scan { 0% { left: -100%; } 100% { left: 100%; } }
+        /* 新增同業 */
+        .add-area { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-end; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        input { border: 1px solid #ddd; padding: 8px; border-radius: 6px; width: 200px; }
 
-        @media print { .top-nav, .visit-link { display: none; } }
+        @media print { .top-nav, .add-area { display: none; } }
     </style>
 </head>
 <body>
 
 <div class="top-nav">
-    <div class="logo-area">
-        <h1><span>🚀</span> 同業優惠 AI 自動監測看板</h1>
-    </div>
+    <div class="logo-area"><h2>📦 同業情報 AI 監測 V8</h2></div>
     <div class="main-controls">
-        <button class="btn btn-ai-all" onclick="scanAllCompetitors()">✨ 一鍵掃描所有業者</button>
-        <button class="btn btn-save" onclick="saveData()">💾 儲存修改</button>
-        <button class="btn" style="background:#34495e; color:white;" onclick="window.print()">🖨️ 列印報表</button>
+        <button class="btn btn-ai" onclick="scanAll()">✨ AI 全自動抓取與清洗</button>
+        <button class="btn btn-save" onclick="saveToLocal()">💾 儲存修改</button>
+        <button class="btn btn-excel" onclick="exportToExcel()">📊 導出統計表 (Excel)</button>
     </div>
 </div>
 
 <div class="container">
-    <div class="grid" id="competitor-grid">
-        <!-- 內容由 JS 生成 -->
+    <div class="add-area">
+        <div class="input-group"><label style="font-size:12px;">同業名稱</label><input type="text" id="new-name" placeholder="名稱"></div>
+        <div class="input-group"><label style="font-size:12px;">網址</label><input type="text" id="new-url" placeholder="https://..."></div>
+        <button class="btn" style="background:var(--accent); color:white" onclick="addNewComp()">➕ 新增業者</button>
     </div>
+
+    <div class="grid" id="comp-grid"></div>
 </div>
 
 <script>
-    const competitors = [
-        { name: "收多易 Easy Storage", url: "https://www.easystorage.com.tw/news", id: "easy" },
-        { name: "易儲居 EC-Fun", url: "https://www.ec-fun.com/news/index.php?index_m_id=6", id: "ecfun" },
-        { name: "永力森 YRS", url: "https://www.yrs.com.tw/news", id: "yrs" },
-        { name: "大典藏 Storage Deluxe", url: "https://storagedeluxe.com.tw/index.php?s=/Home/Index/category/cid/8.html", id: "deluxe" },
-        { name: "摩爾空間 More Space", url: "https://www.morespace.com.tw/blog/news", id: "morespace" },
-        { name: "儲存易 Store Friendly", url: "https://www.store-friendly.com.tw/sfpromotions/", id: "friendly" },
-        { name: "城市置物空間 City Box", url: "https://www.city-box.tw/news/", id: "citybox" }
+    let competitors = [
+        { name: "台灣便利倉", url: "https://www.easystorage.com.tw/news", id: "easy" },
+        { name: "私儲空間", url: "https://www.ec-fun.com/news/index.php?index_m_id=6", id: "ecfun" },
+        { name: "易儲居", url: "https://www.yrs.com.tw/news", id: "yrs" },
+        { name: "大典藏", url: "https://storagedeluxe.com.tw/index.php?s=/Home/Index/category/cid/8.html", id: "deluxe" },
+        { name: "摩爾空間", url: "https://www.morespace.com.tw/blog/news", id: "morespace" },
+        { name: "儲存易", url: "https://www.store-friendly.com.tw/sfpromotions/", id: "friendly" },
+        { name: "城市置物空間", url: "https://www.city-box.tw/news/", id: "citybox" },
+        { name: "Boxful", url: "https://www.boxful.com.tw/zh/", id: "boxful" },
+        { name: "886storage 雲收納", url: "https://www.886storage.com/articles/events", id: "cloud886" }
     ];
 
     function init() {
-        const grid = document.getElementById('competitor-grid');
-        const savedData = JSON.parse(localStorage.getItem('comp_v3_data') || '{}');
+        const savedList = localStorage.getItem('v8_comp_list');
+        if (savedList) competitors = JSON.parse(savedList);
+        render();
+    }
+
+    function render() {
+        const grid = document.getElementById('comp-grid');
+        const savedData = JSON.parse(localStorage.getItem('v8_comp_data') || '{}');
+        grid.innerHTML = '';
 
         competitors.forEach(comp => {
-            const data = savedData[comp.id] || { promo: "", location: "", time: "從未更新" };
+            const data = savedData[comp.id] || { promo: "", location: "" };
             const card = document.createElement('div');
             card.className = 'card';
             card.id = `card-${comp.id}`;
             card.innerHTML = `
                 <div class="card-header">
-                    <div class="comp-info">
-                        <h3>${comp.name}</h3>
-                    </div>
-                    <a href="${comp.url}" target="_blank" class="visit-link">開啟官網驗證 ↗</a>
+                    <span class="card-title">${comp.name}</span>
+                    <a href="${comp.url}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none;">🔗 官網</a>
                 </div>
-                
-                <label class="content-label">📢 最新活動與時間 (AI 判讀)</label>
-                <textarea id="${comp.id}-promo" placeholder="點擊上方按鈕開始 AI 掃描...">${data.promo}</textarea>
-                
-                <label class="content-label">📍 新開幕據點 / 資訊</label>
-                <textarea id="${comp.id}-location" placeholder="等待掃描結果...">${data.location}</textarea>
-                
-                <div class="status-bar">
-                    <span id="${comp.id}-status">狀態: 待機</span>
-                    <span id="${comp.id}-time">${data.time}</span>
-                </div>
+                <label class="label-text">📢 AI 清洗後的活動內容</label>
+                <textarea id="${comp.id}-promo">${data.promo}</textarea>
+                <label class="label-text">📍 偵測到的據點資訊</label>
+                <textarea id="${comp.id}-location">${data.location}</textarea>
             `;
             grid.appendChild(card);
         });
     }
 
-    // 全自動掃描功能
-    async function scanAllCompetitors() {
-        const btn = document.querySelector('.btn-ai-all');
-        btn.innerText = "⏳ 正在同步偵測中...";
+    // --- AI 抓取與亂碼清洗邏輯 ---
+    async function scanAll() {
+        const btn = document.querySelector('.btn-ai');
+        btn.innerText = "⏳ AI 正在清洗網頁亂碼...";
         btn.disabled = true;
 
-        const tasks = competitors.map(comp => fetchAndProcess(comp));
-        await Promise.all(tasks);
-
-        btn.innerText = "✨ 一鍵掃描所有業者";
-        btn.disabled = false;
-        alert("所有業者掃描完成！請確認並修改內容。");
-    }
-
-    // 單一業者處理與 AI 判讀邏輯
-    async function fetchAndProcess(comp) {
-        const statusEl = document.getElementById(`${comp.id}-status`);
-        const promoEl = document.getElementById(`${comp.id}-promo`);
-        const locEl = document.getElementById(`${comp.id}-location`);
-        const cardEl = document.getElementById(`card-${comp.id}`);
-
-        statusEl.innerText = "狀態: 正在抓取...";
-        cardEl.classList.add('scanning');
-
-        try {
-            const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(comp.url)}`);
-            const data = await response.json();
-            const html = data.contents;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            // --- AI 判讀精簡邏輯 ---
-            const textNodes = Array.from(doc.querySelectorAll('h1, h2, h3, h4, a, p, .title, .date'));
-            let results = [];
-            let locations = [];
-
-            textNodes.forEach(node => {
-                const text = node.innerText.trim();
-                // 1. 識別日期格式 (例: 2024/05/01 或 2024-05-01)
-                const dateMatch = text.match(/\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}/);
-                
-                // 2. 識別關鍵字
-                const isPromo = /優惠|折扣|元|%|慶|限時|送|免費|買/.test(text);
-                const isLocation = /開幕|新分店|門市|進駐|倉庫|據點/.test(text);
-
-                if (text.length > 4 && text.length < 100) {
-                    if (isPromo) {
-                        const dateInfo = dateMatch ? ` [期間: ${dateMatch[0]}]` : "";
-                        results.push(`◎ ${text}${dateInfo}`);
-                    }
-                    if (isLocation) {
-                        locations.push(`📍 ${text}`);
-                    }
-                }
-            });
-
-            // 精簡結果：去重並取前 4 筆最相關的
-            const cleanPromo = [...new Set(results)].slice(0, 4).join('\n');
-            const cleanLoc = [...new Set(locations)].slice(0, 2).join('\n');
-
-            promoEl.value = cleanPromo || "無明顯新活動，請手動確認。";
-            locEl.value = cleanLoc || "未偵測到新開幕資訊。";
-            statusEl.innerText = "狀態: 完成";
+        for (let comp of competitors) {
+            const card = document.getElementById(`card-${comp.id}`);
+            card.className = 'card scanning';
             
-        } catch (error) {
-            statusEl.innerText = "狀態: 失敗 (防護阻擋)";
-        } finally {
-            cardEl.classList.remove('scanning');
+            try {
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(comp.url)}`);
+                const json = await response.json();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(json.contents, 'text/html');
+                
+                // 移除腳本與樣式，減少亂碼來源
+                const scripts = doc.querySelectorAll('script, style, nav, footer, header');
+                scripts.forEach(s => s.remove());
+
+                const rawText = doc.body.innerText;
+                
+                // --- 核心 AI 清洗 Regex ---
+                const cleanLines = rawText.split(/[。\n\t]/)
+                    .map(line => line.trim())
+                    .filter(line => {
+                        // 1. 必須包含中文字 (排除純英文/純符號亂碼)
+                        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
+                        // 2. 排除長度過短或過長的雜訊
+                        const validLength = line.length > 5 && line.length < 100;
+                        // 3. 排除常見網頁廢話
+                        const isNotJunk = !/JavaScript|cookies|瀏覽器|版權所有|隱私權|Copyright|Menu|搜尋/.test(line);
+                        return hasChinese && validLength && isNotJunk;
+                    });
+
+                let pResults = [];
+                let lResults = [];
+
+                cleanLines.forEach(line => {
+                    const isPromo = /折|%|元|慶|限時|優惠|方案|現折|領取|折扣|贈送/.test(line);
+                    const isLoc = /開幕|據點|分店|倉庫|進駐|地址|門市|站/.test(line);
+                    
+                    if (isPromo) pResults.push(`• ${line}`);
+                    if (isLoc) lResults.push(`📍 ${line}`);
+                });
+
+                document.getElementById(`${comp.id}-promo`).value = [...new Set(pResults)].slice(0, 5).join('\n');
+                document.getElementById(`${comp.id}-location`).value = [...new Set(lResults)].slice(0, 3).join('\n');
+                card.className = 'card success';
+            } catch (e) { 
+                console.warn(comp.name + " 抓取失敗");
+                card.className = 'card';
+            }
         }
+
+        btn.innerText = "✨ AI 全自動抓取與清洗";
+        btn.disabled = false;
+        alert("AI 已完成亂碼移除與資料清洗！");
     }
 
-    function saveData() {
+    // --- 導出 Excel (CSV) 功能 ---
+    function exportToExcel() {
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+        
+        // CSV 標題
+        let csvContent = "\ufeff"; // 加入 BOM 避免 Excel 中文亂碼
+        csvContent += "業者名稱,促銷活動內容,新據點資訊,資料擷取日期\n";
+
+        competitors.forEach(comp => {
+            // 處理 CSV 格式中的逗號與換行
+            const promo = `"${document.getElementById(`${comp.id}-promo`).value.replace(/"/g, '""')}"`;
+            const loc = `"${document.getElementById(`${comp.id}-location`).value.replace(/"/g, '""')}"`;
+            csvContent += `${comp.name},${promo},${loc},${dateStr}\n`;
+        });
+
+        // 下載檔案
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `同業情報統計表_${dateStr}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function addNewComp() {
+        const name = document.getElementById('new-name').value;
+        const url = document.getElementById('new-url').value;
+        if(!name || !url) return;
+        const id = 'c-' + Date.now();
+        competitors.push({ name, url, id });
+        localStorage.setItem('v8_comp_list', JSON.stringify(competitors));
+        render();
+    }
+
+    function saveToLocal() {
         const data = {};
-        const now = `更新於: ${new Date().toLocaleString()}`;
         competitors.forEach(comp => {
             data[comp.id] = {
                 promo: document.getElementById(`${comp.id}-promo`).value,
-                location: document.getElementById(`${comp.id}-location`).value,
-                time: now
+                location: document.getElementById(`${comp.id}-location`).value
             };
-            document.getElementById(`${comp.id}-time`).innerText = now;
         });
-        localStorage.setItem('comp_v3_data', JSON.stringify(data));
-        alert('✅ 資料已成功儲存！');
+        localStorage.setItem('v8_comp_data', JSON.stringify(data));
+        alert("💾 資料已儲存！");
     }
 
     init();
