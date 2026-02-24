@@ -3,55 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>同業情報 AI 監測 V10 - 排版優化版</title>
+    <title>同業情報 AI 監測 V11</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --success: #27ae60; --ai-purple: #8e44ad; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --success: #27ae60; --ai-purple: #8e44ad; --danger: #e74c3c; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
+        /* 導航列 */
         .top-nav { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .main-controls { display: flex; gap: 10px; }
 
         .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
         
+        /* 新增業者表單 */
+        .add-area { background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; display: flex; gap: 15px; align-items: flex-end; box-shadow: 0 2px 8px rgba(0,0,0,0.05); flex-wrap: wrap; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #666; }
+        input { border: 1px solid #ddd; padding: 10px; border-radius: 6px; width: 250px; outline: none; }
+        input:focus { border-color: var(--accent); }
+
+        /* 業者網格 */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 5px solid #ddd; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 5px solid #ccc; position: relative; }
         .card.success { border-top-color: var(--success); }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .card-title { font-weight: bold; font-size: 18px; color: var(--primary); }
+        .card-title { font-weight: bold; font-size: 17px; color: var(--primary); }
+        .card-btns { display: flex; gap: 8px; align-items: center; }
 
-        .row-group { margin-top: 15px; }
-        .label-text { font-size: 12px; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; display: block; }
-        
-        textarea { width: 100%; border: 1px solid #e0e6ed; border-radius: 6px; padding: 8px; font-size: 13px; box-sizing: border-box; background: #fafafa; line-height: 1.4; resize: vertical; }
-        .promo-area { min-height: 60px; border-left: 3px solid var(--ai-purple); }
-        .time-area { min-height: 40px; border-left: 3px solid #e67e22; color: #d35400; }
-        .loc-area { min-height: 50px; border-left: 3px solid var(--accent); }
+        /* 內容區塊 */
+        .row-group { margin-top: 12px; }
+        .label-text { font-size: 11px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
+        textarea { width: 100%; border: 1px solid #eef2f6; border-radius: 6px; padding: 8px; font-size: 13px; box-sizing: border-box; background: #fafafa; line-height: 1.4; resize: vertical; }
+        .promo-area { border-left: 3px solid var(--ai-purple); min-height: 60px; }
+        .time-area { border-left: 3px solid #e67e22; min-height: 40px; color: #d35400; }
+        .loc-area { border-left: 3px solid var(--accent); min-height: 50px; }
 
+        /* 按鈕樣式 */
         .btn { border: none; border-radius: 6px; padding: 10px 18px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
         .btn-ai { background: var(--ai-purple); color: white; }
         .btn-excel { background: #1d6f42; color: white; }
         .btn-save { background: var(--success); color: white; }
+        .btn-add { background: var(--accent); color: white; }
+        .btn-del { background: none; border: 1px solid #ffcccc; color: var(--danger); padding: 4px 8px; font-size: 11px; }
         .btn:hover { opacity: 0.8; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="top-nav">
-    <div class="logo-area"><h2>🚀 同業活動偵測 V10 (排版優化)</h2></div>
+    <div class="logo-area"><h2>🚀 同業市場情報 AI 監測 V11</h2></div>
     <div class="main-controls">
         <button class="btn btn-ai" onclick="scanAll()">✨ AI 精簡抓取</button>
-        <button class="btn btn-save" onclick="saveToLocal()">💾 儲存修改</button>
+        <button class="btn btn-save" onclick="saveToLocal()">💾 儲存所有修改</button>
         <button class="btn btn-excel" onclick="exportToExcel()">📊 導出整齊 Excel</button>
     </div>
 </div>
 
 <div class="container">
+    <!-- 手動管理名單區 -->
+    <div class="add-area">
+        <div class="input-group"><label>同業名稱</label><input type="text" id="new-name" placeholder="例如：新朋友倉庫"></div>
+        <div class="input-group"><label>官網消息網址</label><input type="text" id="new-url" placeholder="https://..."></div>
+        <button class="btn btn-add" onclick="addNewComp()">➕ 加入追蹤名單</button>
+    </div>
+
     <div class="grid" id="comp-grid"></div>
 </div>
 
 <script>
-    let competitors = [
+    // 預設追蹤名單
+    let defaultCompetitors = [
         { name: "台灣便利倉", url: "https://www.easystorage.com.tw/news", id: "easy" },
         { name: "私儲空間", url: "https://www.ec-fun.com/news/index.php?index_m_id=6", id: "ecfun" },
         { name: "易儲居", url: "https://www.yrs.com.tw/news", id: "yrs" },
@@ -63,11 +85,20 @@
         { name: "886storage 雲收納", url: "https://www.886storage.com/articles/events", id: "cloud886" }
     ];
 
+    let competitors = [];
+
     function init() {
+        const savedList = localStorage.getItem('v11_comp_list');
+        competitors = savedList ? JSON.parse(savedList) : defaultCompetitors;
+        render();
+    }
+
+    function render() {
         const grid = document.getElementById('comp-grid');
-        const savedData = JSON.parse(localStorage.getItem('v10_comp_data') || '{}');
-        
-        competitors.forEach(comp => {
+        const savedData = JSON.parse(localStorage.getItem('v11_comp_data') || '{}');
+        grid.innerHTML = '';
+
+        competitors.forEach((comp, index) => {
             const data = savedData[comp.id] || { promo: "", time: "", location: "" };
             const card = document.createElement('div');
             card.className = 'card';
@@ -75,28 +106,55 @@
             card.innerHTML = `
                 <div class="card-header">
                     <span class="card-title">${comp.name}</span>
-                    <a href="${comp.url}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none;">🔗 官網</a>
+                    <div class="card-btns">
+                        <a href="${comp.url}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none;">🔗 官網</a>
+                        <button class="btn-del" onclick="removeComp(${index})">移除</button>
+                    </div>
                 </div>
                 <div class="row-group">
-                    <label class="label-text">🎯 活動重點 (精簡)</label>
-                    <textarea id="${comp.id}-promo" class="promo-area">${data.promo}</textarea>
+                    <label class="label-text">🎯 活動重點 (AI 精簡)</label>
+                    <textarea id="${comp.id}-promo" class="promo-area" placeholder="點擊一鍵抓取...">${data.promo}</textarea>
                 </div>
                 <div class="row-group">
                     <label class="label-text">📅 有效期限</label>
-                    <textarea id="${comp.id}-time" class="time-area">${data.time}</textarea>
+                    <textarea id="${comp.id}-time" class="time-area" placeholder="自動識別日期...">${data.time}</textarea>
                 </div>
                 <div class="row-group">
                     <label class="label-text">📍 據點新動態</label>
-                    <textarea id="${comp.id}-location" class="loc-area">${data.location}</textarea>
+                    <textarea id="${comp.id}-location" class="loc-area" placeholder="偵測新據點...">${data.location}</textarea>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
+    // --- 新增同業 ---
+    function addNewComp() {
+        const name = document.getElementById('new-name').value;
+        const url = document.getElementById('new-url').value;
+        if (!name || !url) return alert("請輸入完整名稱與網址");
+
+        const newId = 'custom-' + Date.now();
+        competitors.push({ name, url, id: newId });
+        localStorage.setItem('v11_comp_list', JSON.stringify(competitors));
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-url').value = '';
+        render();
+    }
+
+    // --- 移除同業 ---
+    function removeComp(index) {
+        if (confirm("確定要移除此同業追蹤？")) {
+            competitors.splice(index, 1);
+            localStorage.setItem('v11_comp_list', JSON.stringify(competitors));
+            render();
+        }
+    }
+
+    // --- AI 精簡抓取核心 ---
     async function scanAll() {
         const btn = document.querySelector('.btn-ai');
-        btn.innerText = "⏳ 正在精簡分析中...";
+        btn.innerText = "⏳ 正在精簡掃描中...";
         btn.disabled = true;
 
         for (let comp of competitors) {
@@ -111,44 +169,45 @@
                 let pResults = [], tResults = [], lResults = [];
                 const timeRegex = /(\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})|(\d{1,2}\/\d{1,2})|(即日起|至月底|年底前|限時)/g;
 
-                lines.forEach((line, i) => {
-                    const cleanLine = line.replace(/[•📍◎|]/g, '').substring(0, 30); // 限制長度，移除干擾符號
-                    if (/折|%|元|慶|優惠|首月|首年|現折|折扣/.test(line)) {
+                lines.forEach((line) => {
+                    const cleanLine = line.replace(/[•📍◎|]/g, '').substring(0, 35); // V10 精簡邏輯
+                    if (/折|%|元|慶|優惠|方案|現折|折扣|首月|買一送一/.test(line)) {
                         pResults.push(cleanLine);
-                        const timeMatch = line.match(timeRegex);
-                        if (timeMatch) tResults.push(timeMatch[0]);
+                        const tMatch = line.match(timeRegex);
+                        if (tMatch) tResults.push(tMatch[0]);
                     }
                     if (/開幕|據點|分店|進駐|門市|站/.test(line)) lResults.push(cleanLine);
                 });
 
                 document.getElementById(`${comp.id}-promo`).value = [...new Set(pResults)].slice(0, 3).join(' | ');
-                document.getElementById(`${comp.id}-time`).value = [...new Set(tResults)].slice(0, 2).join(', ') || "見官網";
+                document.getElementById(`${comp.id}-time`).value = [...new Set(tResults)].slice(0, 2).join(', ') || "詳見官網";
                 document.getElementById(`${comp.id}-location`).value = [...new Set(lResults)].slice(0, 2).join(' | ');
                 document.getElementById(`card-${comp.id}`).classList.add('success');
             } catch (e) { console.error(comp.name + " 失敗"); }
         }
-        btn.innerText = "✨ AI 精簡抓取"; btn.disabled = false;
-        alert("抓取完成！內容已自動優化排版。");
+        btn.innerText = "✨ AI 精簡抓取";
+        btn.disabled = false;
+        alert("抓取完成！已自動精簡並排版內容。");
     }
 
+    // --- Excel 導出優化 ---
     function exportToExcel() {
-        // BOM 解決中文亂碼
-        let csvContent = "\ufeff業者名稱,最新促銷活動 (精簡),活動期間,據點動態,資料日期\n";
+        let csvContent = "\ufeff業者名稱,最新活動重點,有效期間,據點新動態,資料擷取日期\n";
         const dateStr = new Date().toLocaleDateString();
 
         competitors.forEach(comp => {
-            // 強制移除內容中的所有換行符號 \n \r，確保 Excel 中只有一行
-            const cleanPromo = document.getElementById(`${comp.id}-promo`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
-            const cleanTime = document.getElementById(`${comp.id}-time`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
-            const cleanLoc = document.getElementById(`${comp.id}-location`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
+            // 強制將換行符號轉為空白，確保 Excel 單行對齊
+            const promo = document.getElementById(`${comp.id}-promo`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
+            const time = document.getElementById(`${comp.id}-time`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
+            const loc = document.getElementById(`${comp.id}-location`).value.replace(/[\n\r]/g, ' ').replace(/"/g, '""');
             
-            csvContent += `${comp.name},"${cleanPromo}","${cleanTime}","${cleanLoc}",${dateStr}\n`;
+            csvContent += `${comp.name},"${promo}","${time}","${loc}",${dateStr}\n`;
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `倉儲同業市場月報_對齊版_${dateStr}.csv`;
+        link.download = `倉儲市場監測報告_${dateStr}.csv`;
         link.click();
     }
 
@@ -161,8 +220,8 @@
                 location: document.getElementById(`${comp.id}-location`).value
             };
         });
-        localStorage.setItem('v10_comp_data', JSON.stringify(data));
-        alert("💾 資料已儲存！");
+        localStorage.setItem('v11_comp_data', JSON.stringify(data));
+        alert("💾 資料與名單已成功儲存！");
     }
 
     init();
