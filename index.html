@@ -1,781 +1,967 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>同業情報 AI 監測 V12</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --surface2: #1f2937;
-            --border: #30363d;
-            --text: #e6edf3;
-            --text-muted: #8b949e;
-            --accent: #58a6ff;
-            --green: #3fb950;
-            --purple: #bc8cff;
-            --orange: #f0883e;
-            --red: #f85149;
-            --yellow: #d29922;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>同業情報 AI 監測 V13</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117; --surface:#161b22; --surface2:#1f2937; --surface3:#232c3b;
+  --border:#30363d; --border2:#3d4653;
+  --text:#e6edf3; --text-dim:#a9b4c0; --text-muted:#8b949e;
+  --accent:#58a6ff; --green:#3fb950; --purple:#bc8cff;
+  --orange:#f0883e; --red:#f85149; --yellow:#d29922;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--text); min-height:100vh;
+  font-size:14px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ─── NAV ─── */
+.nav{
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:13px 26px; position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.nav-brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:17px;letter-spacing:-.3px}
+.nav-brand span{color:var(--accent)}
+.badge{background:var(--accent);color:#0d1117;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;font-family:'JetBrains Mono',monospace}
+.nav-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
+/* ─── REGION BAR ─── */
+.region-bar{
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:9px 26px; display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+}
+.region-label{font-size:12px;color:var(--text-muted);font-weight:500;white-space:nowrap}
+.region-pill{
+  border:1px solid var(--border); background:transparent; color:var(--text-dim);
+  padding:5px 14px; border-radius:99px; font-size:12px; cursor:pointer;
+  transition:all .18s; font-family:inherit;
+}
+.region-pill:hover{border-color:var(--accent);color:var(--accent)}
+.region-pill.active{background:var(--accent);border-color:var(--accent);color:#0d1117;font-weight:700}
 
-        /* ─── NAV ─── */
-        .nav {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 28px;
-            position: sticky; top: 0; z-index: 100;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; flex-wrap: wrap;
-        }
-        .nav-brand {
-            display: flex; align-items: center; gap: 10px;
-            font-weight: 900; font-size: 17px; color: var(--text);
-            letter-spacing: -0.3px;
-        }
-        .nav-brand span { color: var(--accent); }
-        .badge { background: var(--accent); color: #0d1117; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; font-family: 'JetBrains Mono', monospace; }
+.container{max-width:1560px;margin:0 auto;padding:22px 20px 60px}
 
-        .nav-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* ─── PANEL ─── */
+.panel{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; margin-bottom:16px; overflow:hidden;
+}
+.panel-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; padding:14px 18px;
+  border-bottom:1px solid var(--border); background:var(--surface2);
+}
+.panel-head h2{font-size:14.5px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+.panel-head h2 .cnt{
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600;
+  background:var(--surface3); color:var(--text-dim);
+  padding:1px 8px; border-radius:99px; border:1px solid var(--border);
+}
+.panel-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.panel-body{padding:16px 18px}
 
-        /* ─── REGION BAR ─── */
-        .region-bar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 10px 28px;
-            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-        }
-        .region-label { font-size: 12px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
-        .region-pill {
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-muted);
-            padding: 5px 14px;
-            border-radius: 99px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all .2s;
-            font-family: 'Noto Sans TC', sans-serif;
-        }
-        .region-pill:hover { border-color: var(--accent); color: var(--accent); }
-        .region-pill.active { background: var(--accent); border-color: var(--accent); color: #0d1117; font-weight: 700; }
+/* ─── ADD FORM ─── */
+.add-panel{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding:16px 18px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.4px}
+.field input,.field select{
+  background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:8px 11px; border-radius:6px; font-size:13px; font-family:inherit;
+  outline:none; transition:border-color .18s; min-width:150px;
+}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field input::placeholder{color:#5c6672}
 
-        /* ─── CONTAINER ─── */
-        .container { max-width: 1500px; margin: 0 auto; padding: 24px 20px; }
+/* ─── STATS ─── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat-box{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:9px; padding:13px 17px; position:relative; overflow:hidden;
+}
+.stat-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.85}
+.stat-box.s2::before{background:var(--green)}
+.stat-box.s3::before{background:var(--purple)}
+.stat-box.s4::before{background:var(--orange)}
+.stat-val{font-size:27px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1.15}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;letter-spacing:.3px}
 
-        /* ─── ADD FORM ─── */
-        .add-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px 20px;
-            margin-bottom: 22px;
-            display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;
-        }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        .field label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
-        .field input, .field select {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 9px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            outline: none;
-            font-family: 'Noto Sans TC', sans-serif;
-        }
-        .field input { width: 230px; }
-        .field select { width: 140px; }
-        .field input:focus, .field select:focus { border-color: var(--accent); }
+/* ─── PROGRESS ─── */
+.progress-wrap{margin-bottom:16px;display:none}
+.progress-wrap.show{display:block}
+.progress-bar-bg{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:99px;transition:width .3s}
+.progress-text{font-size:12px;color:var(--text-dim);margin-top:7px;font-family:'JetBrains Mono',monospace}
 
-        /* ─── STATS ─── */
-        .stats-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .stat-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 18px;
-            flex: 1; min-width: 120px;
-        }
-        .stat-val { font-size: 26px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
-        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+/* ─── TABLE ─── */
+.table-wrap{max-height:74vh;overflow:auto;border-radius:0 0 10px 10px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+thead th{
+  position:sticky; top:0; z-index:5;
+  background:#1b2230; color:var(--text-dim);
+  font-size:11.5px; font-weight:700; letter-spacing:.5px;
+  text-align:left; padding:11px 12px; white-space:nowrap;
+  border-bottom:1px solid var(--border2);
+}
+tbody td{padding:12px;border-bottom:1px solid #232a35;vertical-align:top}
+tbody tr.data-row:hover{background:rgba(88,166,255,.045)}
+tbody tr.data-row:nth-of-type(4n+1){background:rgba(255,255,255,.014)}
+tbody tr.data-row:nth-of-type(4n+1):hover{background:rgba(88,166,255,.06)}
 
-        /* ─── PROGRESS ─── */
-        .progress-wrap { margin-bottom: 20px; display: none; }
-        .progress-wrap.show { display: block; }
-        .progress-bar-bg { background: var(--surface2); border-radius: 99px; height: 6px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 99px; transition: width .4s; }
-        .progress-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+.c-idx{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);width:38px}
+.c-name{min-width:150px}
+.c-name a{color:var(--text);font-weight:700;font-size:14px;text-decoration:none;display:block;line-height:1.4}
+.c-name a:hover{color:var(--accent);text-decoration:underline}
+.c-name .sub{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-top:2px;word-break:break-all}
+.c-promo{min-width:300px;max-width:430px}
+.c-promo ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.c-promo li{
+  position:relative; padding-left:13px; font-size:13px; line-height:1.6;
+  color:var(--text); word-break:break-word;
+}
+.c-promo li::before{
+  content:''; position:absolute; left:2px; top:8px;
+  width:5px; height:5px; border-radius:50%; background:var(--purple);
+}
+.c-time{min-width:110px;font-size:12.5px;color:var(--orange);font-family:'JetBrains Mono',monospace;line-height:1.5}
+.c-loc{min-width:150px;max-width:230px;font-size:12.5px;color:var(--accent);line-height:1.55}
+.c-src{min-width:130px;font-size:11px;color:var(--text-muted);line-height:1.5}
+.c-src .mono{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#6e7a87}
+.c-act{white-space:nowrap;width:96px}
+.dash{color:#4d5763}
 
-        /* ─── GRID ─── */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+/* ─── BADGES ─── */
+.badge-st{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px;
+  white-space:nowrap; border:1px solid transparent;
+}
+.badge-st::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-ok{background:rgba(63,185,80,.13);color:var(--green);border-color:rgba(63,185,80,.35)}
+.b-part{background:rgba(210,153,34,.13);color:var(--yellow);border-color:rgba(210,153,34,.35)}
+.b-err{background:rgba(248,81,73,.13);color:var(--red);border-color:rgba(248,81,73,.35)}
+.b-idle{background:rgba(139,148,158,.1);color:var(--text-muted);border-color:rgba(139,148,158,.28)}
+.b-run{background:rgba(88,166,255,.13);color:var(--accent);border-color:rgba(88,166,255,.35)}
+.b-run::before{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
-        /* ─── CARD ─── */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            transition: border-color .3s;
-        }
-        .card:hover { border-color: #444c56; }
-        .card.success { border-color: var(--green); }
-        .card.scanning { border-color: var(--accent); }
-        .card.error { border-color: var(--red); }
-        .card.hidden { display: none; }
+.tag-region{
+  font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;
+  background:var(--surface3);border:1px solid var(--border);white-space:nowrap;
+}
 
-        .card-status-bar { height: 3px; background: var(--surface2); }
-        .card.success .card-status-bar { background: var(--green); }
-        .card.scanning .card-status-bar { background: linear-gradient(90deg, var(--accent), var(--purple)); animation: shimmer 1.5s infinite; }
-        .card.error .card-status-bar { background: var(--red); }
-        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:.4} }
+/* ─── BUTTONS ─── */
+.btn{
+  border:none; border-radius:7px; padding:8px 15px; cursor:pointer;
+  font-weight:700; font-size:13px; display:inline-flex; align-items:center; gap:6px;
+  transition:.18s; font-family:inherit; white-space:nowrap;
+}
+.btn:hover{opacity:.86;transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-ai{background:linear-gradient(135deg,#6366f1,var(--purple));color:#fff}
+.btn-save{background:var(--green);color:#0d1117}
+.btn-excel{background:#1a7f37;color:#fff}
+.btn-add{background:var(--accent);color:#0d1117}
+.btn-clear{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)}
+.btn-mini{
+  background:var(--surface2); border:1px solid var(--border); color:var(--accent);
+  padding:4px 9px; border-radius:5px; font-size:11px; cursor:pointer;
+  font-family:inherit; transition:.18s; margin-right:4px;
+}
+.btn-mini:hover{background:var(--accent);color:#0d1117;border-color:var(--accent)}
+.btn-mini.danger{color:var(--red)}
+.btn-mini.danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
-        .card-inner { padding: 16px 18px; }
-        .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-        .card-name { font-weight: 700; font-size: 16px; }
-        .card-region-tag {
-            font-size: 10px; font-weight: 700;
-            padding: 2px 8px; border-radius: 99px;
-            background: var(--surface2);
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            white-space: nowrap;
-        }
-        .card-actions { display: flex; gap: 6px; align-items: center; }
-        .card-link { font-size: 11px; color: var(--accent); text-decoration: none; white-space: nowrap; }
-        .card-link:hover { text-decoration: underline; }
-        .btn-scan-one {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            cursor: pointer;
-            font-family: 'Noto Sans TC', sans-serif;
-            transition: .2s;
-            white-space: nowrap;
-        }
-        .btn-scan-one:hover { background: var(--accent); color: #0d1117; }
-        .btn-del-card {
-            background: none; border: 1px solid transparent;
-            color: var(--red); font-size: 11px;
-            padding: 4px 8px; border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Noto Sans TC', sans-serif;
-        }
-        .btn-del-card:hover { border-color: var(--red); }
+/* ─── DETAIL ROW ─── */
+tr.detail-row{display:none}
+tr.detail-row.open{display:table-row}
+tr.detail-row td{background:#11161e;padding:0;border-bottom:1px solid var(--border2)}
+.detail-inner{padding:14px 18px}
+.detail-inner h4{font-size:11px;color:var(--text-muted);letter-spacing:.6px;margin-bottom:7px;font-weight:700}
+.detail-inner pre{
+  font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.75;
+  color:var(--text-dim); white-space:pre-wrap; word-break:break-word;
+  max-height:280px; overflow:auto; background:var(--bg);
+  border:1px solid var(--border); border-radius:6px; padding:11px 13px;
+}
 
-        /* ─── FIELDS ─── */
-        .field-group { margin-bottom: 10px; }
-        .field-label {
-            font-size: 10px; font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 4px;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .field-label .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        .dot-promo { background: var(--purple); }
-        .dot-time { background: var(--orange); }
-        .dot-loc { background: var(--accent); }
-        .dot-raw { background: var(--yellow); }
+/* ─── EMPTY ─── */
+.empty-state{text-align:center;padding:56px 20px;color:var(--text-muted)}
+.empty-state h3{font-size:18px;margin-bottom:7px;color:var(--text-dim)}
 
-        textarea {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 9px 11px;
-            border-radius: 6px;
-            font-size: 12.5px;
-            line-height: 1.6;
-            resize: vertical;
-            font-family: 'Noto Sans TC', sans-serif;
-            min-height: 52px;
-            outline: none;
-            transition: border-color .2s;
-        }
-        textarea:focus { border-color: var(--accent); }
+/* ─── NOTE ─── */
+.note{padding:16px 18px;font-size:12.5px;color:var(--text-dim);line-height:1.85}
+.note h3{font-size:13px;color:var(--text);margin-bottom:9px;font-weight:700}
+.note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.note li{padding-left:16px;position:relative}
+.note li::before{content:'▸';position:absolute;left:0;color:var(--accent)}
+.note code{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;
+  background:var(--surface3);padding:1px 6px;border-radius:4px;color:var(--accent);
+}
 
-        .ts-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .ts-text { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+/* ─── TOAST ─── */
+#toast{
+  position:fixed;bottom:26px;right:26px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;padding:12px 18px;
+  font-size:13px;z-index:999;opacity:0;transform:translateY(8px);
+  transition:.28s;pointer-events:none;max-width:340px;
+  box-shadow:0 8px 28px rgba(0,0,0,.5);
+}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{border-color:var(--green);color:var(--green)}
+#toast.err{border-color:var(--red);color:var(--red)}
+#toast.info{border-color:var(--accent);color:var(--accent)}
 
-        /* ─── BUTTONS ─── */
-        .btn {
-            border: none;
-            border-radius: 7px;
-            padding: 9px 16px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 13px;
-            display: inline-flex; align-items: center; gap: 7px;
-            transition: .2s;
-            font-family: 'Noto Sans TC', sans-serif;
-            white-space: nowrap;
-        }
-        .btn:hover { opacity: .85; transform: translateY(-1px); }
-        .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-        .btn-ai { background: linear-gradient(135deg, #6366f1, var(--purple)); color: white; }
-        .btn-save { background: var(--green); color: #0d1117; }
-        .btn-excel { background: #1a7f37; color: white; }
-        .btn-add { background: var(--accent); color: #0d1117; }
-        .btn-clear { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
-
-        .btn-paste {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--yellow);
-            font-size: 13px;
-            padding: 4px 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: .2s;
-        }
-        .btn-paste:hover { border-color: var(--yellow); }
-        .btn-paste-analyse {
-            background: linear-gradient(135deg, #6366f1, var(--purple));
-            border: none;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 6px;
-            font-family: 'Noto Sans TC', sans-serif;
-        }
-        .btn-paste-analyse:hover { opacity: .85; }
-
-        /* ─── EMPTY STATE ─── */
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-        .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
-
-        /* ─── TOAST ─── */
-        #toast {
-            position: fixed; bottom: 28px; right: 28px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 18px;
-            font-size: 13px;
-            z-index: 999;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: .3s;
-            pointer-events: none;
-            max-width: 320px;
-        }
-        #toast.show { opacity: 1; transform: translateY(0); }
-        #toast.ok { border-color: var(--green); color: var(--green); }
-        #toast.err { border-color: var(--red); color: var(--red); }
-        #toast.info { border-color: var(--accent); color: var(--accent); }
-    </style>
+@media(max-width:760px){
+  .container{padding:16px 12px 50px}
+  .nav,.region-bar{padding-left:14px;padding-right:14px}
+  .add-panel{padding:14px}
+  .field input,.field select{min-width:0;width:100%}
+  .field{flex:1 1 100%}
+  .table-wrap{max-height:none}
+  table{font-size:12.5px}
+  thead th,tbody td{padding:9px 8px}
+}
+</style>
 </head>
 <body>
 
-<!-- NAV -->
 <div class="nav">
-    <div class="nav-brand">
-        🗂 同業情報監測 <span>AI</span> <span class="badge">V12</span>
-    </div>
-    <div class="nav-right">
-        <button class="btn btn-ai" id="btn-scan-all" onclick="scanAll()">✨ 一鍵 AI 全掃描</button>
-        <button class="btn btn-save" onclick="saveToLocal()">💾 儲存</button>
-        <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel 報表</button>
-        <button class="btn btn-clear" onclick="clearAll()">🗑 清除資料</button>
-    </div>
+  <div class="nav-brand">🗂 同業情報監測 <span>AI</span> <span class="badge">V13</span></div>
+  <div class="nav-right">
+    <button class="btn btn-ai" id="btn-scan-all" onclick="scanAll()">✨ 一鍵全掃描</button>
+    <button class="btn btn-save" onclick="saveToLocal()">💾 儲存</button>
+    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel 報表</button>
+    <button class="btn btn-clear" onclick="clearAll()">🗑 清除資料</button>
+  </div>
 </div>
 
-<!-- REGION BAR -->
 <div class="region-bar">
-    <span class="region-label">📍 篩選區域：</span>
-    <button class="region-pill active" data-region="all" onclick="filterRegion('all')">全部</button>
-    <button class="region-pill" data-region="北部" onclick="filterRegion('北部')">北部</button>
-    <button class="region-pill" data-region="中部" onclick="filterRegion('中部')">中部</button>
-    <button class="region-pill" data-region="南部" onclick="filterRegion('南部')">南部</button>
-    <button class="region-pill" data-region="東部" onclick="filterRegion('東部')">東部</button>
-    <button class="region-pill" data-region="全台" onclick="filterRegion('全台')">全台連鎖</button>
+  <span class="region-label">📍 篩選區域：</span>
+  <button class="region-pill active" data-region="all" onclick="filterRegion('all')">全部</button>
+  <button class="region-pill" data-region="北部" onclick="filterRegion('北部')">北部</button>
+  <button class="region-pill" data-region="中部" onclick="filterRegion('中部')">中部</button>
+  <button class="region-pill" data-region="南部" onclick="filterRegion('南部')">南部</button>
+  <button class="region-pill" data-region="東部" onclick="filterRegion('東部')">東部</button>
+  <button class="region-pill" data-region="全台" onclick="filterRegion('全台')">全台連鎖</button>
 </div>
 
 <div class="container">
 
-    <!-- ADD FORM -->
+  <div class="panel">
     <div class="add-panel">
-        <div class="field"><label>同業名稱</label><input type="text" id="new-name" placeholder="例：新朋友倉庫"></div>
-        <div class="field"><label>官網 / 消息網址</label><input type="text" id="new-url" placeholder="https://..." style="width:300px"></div>
-        <div class="field">
-            <label>服務區域</label>
-            <select id="new-region">
-                <option value="全台">全台連鎖</option>
-                <option value="北部">北部</option>
-                <option value="中部">中部</option>
-                <option value="南部">南部</option>
-                <option value="東部">東部</option>
-            </select>
-        </div>
-        <button class="btn btn-add" onclick="addNewComp()">➕ 加入追蹤</button>
+      <div class="field"><label>同業名稱</label><input type="text" id="new-name" placeholder="例：新朋友倉庫"></div>
+      <div class="field" style="flex:1 1 300px"><label>官網 / 消息網址</label><input type="text" id="new-url" placeholder="https://..." style="width:100%"></div>
+      <div class="field"><label>服務區域</label>
+        <select id="new-region">
+          <option value="全台">全台連鎖</option>
+          <option value="北部">北部</option>
+          <option value="中部">中部</option>
+          <option value="南部">南部</option>
+          <option value="東部">東部</option>
+        </select>
+      </div>
+      <button class="btn btn-add" onclick="addNewComp()">➕ 加入追蹤</button>
     </div>
+  </div>
 
-    <!-- STATS -->
-    <div class="stats-row">
-        <div class="stat-box"><div class="stat-val" id="stat-total" style="color:var(--accent)">0</div><div class="stat-label">追蹤業者</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-scanned" style="color:var(--green)">0</div><div class="stat-label">已掃描</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-promos" style="color:var(--purple)">0</div><div class="stat-label">發現活動</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-region" style="color:var(--orange)">全部</div><div class="stat-label">目前區域</div></div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-val" id="stat-total" style="color:var(--accent)">0</div><div class="stat-label">追蹤業者</div></div>
+    <div class="stat-box s2"><div class="stat-val" id="stat-scanned" style="color:var(--green)">0</div><div class="stat-label">擷取成功</div></div>
+    <div class="stat-box s3"><div class="stat-val" id="stat-promos" style="color:var(--purple)">0</div><div class="stat-label">發現活動</div></div>
+    <div class="stat-box s4"><div class="stat-val" id="stat-region" style="color:var(--orange)">全部</div><div class="stat-label">目前區域</div></div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-text" id="progress-text">準備掃描...</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>📋 同業動態總表 <span class="cnt" id="row-count">0</span></h2>
+      <div class="panel-tools">
+        <input type="text" id="search-box" placeholder="搜尋業者 / 活動關鍵字…" oninput="onSearch(this.value)"
+               style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:6px;font-size:12.5px;font-family:inherit;outline:none;min-width:200px">
+        <select id="status-filter" onchange="onStatusFilter(this.value)"
+                style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:6px;font-size:12.5px;font-family:inherit;outline:none">
+          <option value="all">全部狀態</option>
+          <option value="ok">擷取成功</option>
+          <option value="part">部分資料</option>
+          <option value="err">擷取失敗</option>
+          <option value="idle">尚未掃描</option>
+        </select>
+      </div>
     </div>
-
-    <!-- PROGRESS -->
-    <div class="progress-wrap" id="progress-wrap">
-        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
-        <div class="progress-text" id="progress-text">準備掃描...</div>
+    <div class="table-wrap">
+      <table id="main-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>業者</th>
+            <th>區域</th>
+            <th>狀態</th>
+            <th>活動促銷重點</th>
+            <th>有效期限</th>
+            <th>據點 / 展店動態</th>
+            <th>資料來源 / 查詢時間</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
+  </div>
 
-    <!-- GRID -->
-    <div class="grid" id="comp-grid"></div>
+  <div class="panel note">
+    <h3>⚙️ 抓取方式與判讀說明</h3>
+    <ul>
+      <li><strong>抓取管道</strong>：透過 <code>r.jina.ai</code> 讀取各業者官網，回傳已轉為純文字的完整頁面內容（保留標題、清單與連結文字），再由瀏覽器端以關鍵字規則解析。所有站台<strong>並行抓取</strong>（同時 6 條），單站逾時 15 秒即跳過，不會拖住其他站台。</li>
+      <li><strong>活動判讀</strong>：以「折、%、元、優惠、方案、免費、限定、送、回饋、折扣、特惠、首月、買一送一、免租、贈」等關鍵字比對，並自動排除導覽選單列，取最相關的項目列出。</li>
+      <li><strong>狀態說明</strong>：<span class="badge-st b-ok">成功</span> 讀到頁面且有活動項目；<span class="badge-st b-part">部分</span> 讀到頁面但未命中活動關鍵字（可能該頁當期無促銷）；<span class="badge-st b-err">失敗</span> 逾時、被防爬機制阻擋或連線失敗。</li>
+      <li><strong>已知限制</strong>：少數站台（如 city-box.tw）有 Cloudflare 機器人驗證，程式化讀取會被阻擋，需手動點「官網」查看。活動判讀為關鍵字規則，非語意理解，可能漏掉未含上述關鍵字的活動，或收進條款說明文字，請以官網原文為準。</li>
+      <li><strong>速率限制</strong>：<code>r.jina.ai</code> 為公開服務，短時間內大量重複掃描可能被限流（回 429）。若遇此情況，請稍候 30 秒再按「重掃」。</li>
+      <li><strong>資料存放</strong>：結果存在<strong>本機瀏覽器</strong>（localStorage），換裝置或清除瀏覽器資料即消失。要留存請用「Excel 報表」匯出。</li>
+    </ul>
+  </div>
+
 </div>
 
 <div id="toast"></div>
 
 <script>
-const CLAUDE_API = "https://api.anthropic.com/v1/messages";
-
-// 多個 CORS proxy，依序嘗試
-const PROXIES = [
-    url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-    url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-    url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-    url => `https://thingproxy.freeboard.io/fetch/${url}`,
-];
+/* ══════════════════════════════════════════════
+   設定
+   ══════════════════════════════════════════════ */
+const JINA = 'https://r.jina.ai/';
+const FETCH_TIMEOUT = 15000;
+const CONCURRENCY = 6;
+const LS_LIST = 'v13_comp_list';
+const LS_DATA = 'v13_comp_data';
 
 const defaultCompetitors = [
-    { name: "台灣便利倉", url: "https://www.easystorage.com.tw/news", id: "easy", region: "全台" },
-    { name: "私儲空間", url: "https://www.ec-fun.com/news/index.php?index_m_id=6", id: "ecfun", region: "全台" },
-    { name: "易儲居", url: "https://www.yrs.com.tw/news", id: "yrs", region: "北部" },
-    { name: "大典藏", url: "https://storagedeluxe.com.tw/index.php?s=/Home/Index/category/cid/8.html", id: "deluxe", region: "北部" },
-    { name: "摩爾空間", url: "https://www.morespace.com.tw/blog/news", id: "morespace", region: "全台" },
-    { name: "儲存易", url: "https://www.store-friendly.com.tw/sfpromotions/", id: "friendly", region: "全台" },
-    { name: "城市置物空間", url: "https://www.city-box.tw/news/", id: "citybox", region: "北部" },
-    { name: "Boxful", url: "https://www.boxful.com.tw/zh/", id: "boxful", region: "全台" },
-    { name: "886storage 雲收納", url: "https://www.886storage.com/articles/events", id: "cloud886", region: "全台" }
+  { name:"台灣便利倉", url:"https://www.easystorage.com.tw/news", id:"easy", region:"全台" },
+  { name:"私儲空間", url:"https://www.ec-fun.com/news/index.php?index_m_id=6", id:"ecfun", region:"全台" },
+  { name:"易儲居", url:"https://www.yrs.com.tw/news", id:"yrs", region:"北部" },
+  { name:"大典藏", url:"https://storagedeluxe.com.tw/index.php?s=/Home/Index/category/cid/8.html", id:"deluxe", region:"北部" },
+  { name:"摩爾空間", url:"https://www.morespace.com.tw/blog/news", id:"morespace", region:"全台" },
+  { name:"儲存易", url:"https://www.store-friendly.com.tw/sfpromotions/", id:"friendly", region:"全台" },
+  { name:"城市置物空間", url:"https://www.city-box.tw/news/", id:"citybox", region:"北部" },
+  { name:"Boxful", url:"https://www.boxful.com.tw/zh/", id:"boxful", region:"全台" },
+  { name:"886storage 雲收納", url:"https://www.886storage.com/articles/events", id:"cloud886", region:"全台" }
 ];
 
 let competitors = [];
-let currentRegion = "all";
+let currentRegion = 'all';
+let searchTerm = '';
+let statusFilter = 'all';
+let state = {};          // id -> {status, promo[], time, location[], raw, ts, err}
+let expanded = new Set();
 
-/* ── INIT ── */
-function init() {
-    const saved = localStorage.getItem('v12_comp_list');
-    competitors = saved ? JSON.parse(saved) : defaultCompetitors;
-    render();
-    updateStats();
+/* ══════════════════════════════════════════════
+   初始化
+   ══════════════════════════════════════════════ */
+function init(){
+  try{
+    const saved = localStorage.getItem(LS_LIST);
+    competitors = saved ? JSON.parse(saved) : defaultCompetitors.slice();
+  }catch(e){ competitors = defaultCompetitors.slice(); }
+  try{
+    state = JSON.parse(localStorage.getItem(LS_DATA) || '{}');
+  }catch(e){ state = {}; }
+  render();
 }
 
-/* ── REGION FILTER ── */
-function filterRegion(r) {
-    currentRegion = r;
-    document.querySelectorAll('.region-pill').forEach(p => p.classList.toggle('active', p.dataset.region === r));
-    document.getElementById('stat-region').textContent = r === 'all' ? '全部' : r;
-    document.querySelectorAll('.card').forEach(card => {
-        const cr = card.dataset.region;
-        card.classList.toggle('hidden', r !== 'all' && cr !== r && !(r === '全台' && cr === '全台'));
+/* ══════════════════════════════════════════════
+   抓取（單站）
+   ══════════════════════════════════════════════ */
+async function fetchSite(url){
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
+  try{
+    const res = await fetch(JINA + url, {
+      signal: ctrl.signal,
+      headers: { 'Accept': 'text/plain' }
     });
-}
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    if(!text || text.length < 80) throw new Error('回應內容過短');
 
-/* ── RENDER ── */
-function render() {
-    const grid = document.getElementById('comp-grid');
-    const savedData = JSON.parse(localStorage.getItem('v12_comp_data') || '{}');
-    grid.innerHTML = '';
-
-    if (competitors.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><h3>尚無追蹤業者</h3><p>使用上方表單加入同業</p></div>';
-        return;
+    // 防爬 / 驗證頁偵測
+    const head = text.slice(0, 800);
+    if(/Just a moment|Performing security verification|security service to protect|Enable JavaScript and cookies|CAPTCHA/i.test(head)){
+      throw new Error('BLOCKED');
     }
-
-    competitors.forEach((comp, idx) => {
-        const d = savedData[comp.id] || { promo:'', time:'', location:'', raw:'', ts:'' };
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.id = `card-${comp.id}`;
-        card.dataset.region = comp.region || '全台';
-        const regionColor = { '北部':'#58a6ff','中部':'#3fb950','南部':'#f0883e','東部':'#bc8cff','全台':'#8b949e' }[comp.region] || '#8b949e';
-        card.innerHTML = `
-            <div class="card-status-bar"></div>
-            <div class="card-inner">
-                <div class="card-head">
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                        <span class="card-name">${comp.name}</span>
-                        <span class="card-region-tag" style="border-color:${regionColor};color:${regionColor}">${comp.region||'全台'}</span>
-                    </div>
-                    <div class="card-actions">
-                        <a class="card-link" href="${comp.url}" target="_blank">🔗 官網</a>
-                        <button class="btn-scan-one" onclick="scanOne('${comp.id}', this)">⚡ 掃描</button>
-                        <button class="btn-paste" onclick="showPasteBox('${comp.id}')" title="手動貼上網頁文字">📋</button>
-                        <button class="btn-del-card" onclick="removeComp(${idx})">✕</button>
-                    </div>
-                </div>
-
-                <div class="paste-box" id="${comp.id}-pastebox" style="display:none;margin-bottom:10px">
-                    <div class="field-label" style="margin-bottom:5px">📋 手動貼上：前往官網，全選複製文字後貼到此處，再點分析</div>
-                    <textarea id="${comp.id}-pasteraw" rows="4" style="font-size:11px;border-color:var(--yellow)" placeholder="Ctrl+A 複製官網文字後貼在此處..."></textarea>
-                    <button class="btn-paste-analyse" onclick="analyseManual('${comp.id}')">🤖 AI 分析貼上內容</button>
-                </div>
-
-                <div class="field-group">
-                    <div class="field-label"><span class="dot dot-promo"></span>活動促銷重點 (AI 精析)</div>
-                    <textarea id="${comp.id}-promo" rows="3" placeholder="尚未掃描...">${d.promo}</textarea>
-                </div>
-                <div class="field-group">
-                    <div class="field-label"><span class="dot dot-time"></span>活動有效期限</div>
-                    <textarea id="${comp.id}-time" rows="1" placeholder="自動識別日期...">${d.time}</textarea>
-                </div>
-                <div class="field-group">
-                    <div class="field-label"><span class="dot dot-loc"></span>據點 / 展店動態</div>
-                    <textarea id="${comp.id}-location" rows="2" placeholder="偵測新據點...">${d.location}</textarea>
-                </div>
-                <div class="field-group">
-                    <div class="field-label"><span class="dot dot-raw"></span>原始擷取片段</div>
-                    <textarea id="${comp.id}-raw" rows="2" style="font-size:11px;color:var(--text-muted)" placeholder="原始資料...">${d.raw}</textarea>
-                </div>
-
-                <div class="ts-row">
-                    <span class="ts-text" id="${comp.id}-ts">${d.ts ? '最後掃描：'+d.ts : '尚未掃描'}</span>
-                    <span style="font-size:10px;color:var(--text-muted)">${comp.url.replace(/https?:\/\//,'').substring(0,40)}...</span>
-                </div>
-            </div>`;
-        grid.appendChild(card);
-    });
-    filterRegion(currentRegion);
-    updateStats();
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
-/* ── CLAUDE AI ANALYSE ── */
-async function claudeAnalyse(text, compName) {
-    const prompt = `你是台灣倉儲業競爭情報分析師。以下是從「${compName}」官網擷取的原始文字，請從中提取關鍵商業情報。
+/* ══════════════════════════════════════════════
+   解析（Markdown → 結構化）
+   ══════════════════════════════════════════════ */
+const PROMO_RE = /(折|%|元|\$|優惠|方案|免費|限定|送|回饋|折扣|特惠|體驗價|首月|買一送一|免租|贈|降價|下殺|好禮|促銷|開幕價)/;
+const NAV_RE = /^(首頁|HOME|選單|主選單|最新消息|最新優惠|優惠活動|倉庫優惠|周邊商品|加值服務|關於我們|常見問題|聯絡我們|服務據點|分店公告|消息情報|English|繁中|登入|註冊|立即預約|線上繳費|部落格|用戶實例|案例分享|租倉攻略|收納知識|公益與媒體|品牌理念|我們的團隊|品牌故事|簽約|付費|搬家|貨運|物流|安全性|使用方式|其他問題|詢價|表單|預約參觀|公司登記|空間計算|多樣用途|租倉流程|倉庫介紹|迷你倉介紹|活動訊息|特約優惠|官方公告|更多服務|尋找門市|櫃型介紹|租倉指南|空間靈感|Smart Living|特別企劃|ALL|News|消息|選單|主選單|Go-Top|Follow us on|合作夥伴|聯絡資訊|網站地圖|網頁設計)$/i;
+const DATE_RE = /(20\d{2})\s*[\/\-\.年]\s*(\d{1,2})\s*[\/\-\.月]\s*(\d{1,2})?\s*日?/g;
+const REL_RE = /(即日起|至月底|年底前|限時|售完為止|送完為止|數量有限|活動期間|止)/;
+const LOC_RE = /(開幕|新開幕|新據點|新門市|新店|進駐|新址|遷址|擴大|展店|旗艦店|分店|門市|據點)/;
 
-原始文字：
-${text.substring(0, 3000)}
+/* jina 回傳的 metadata 標頭，必須整段丟棄 */
+const META_RE = /^(Title|URL Source|Markdown Content|Final URL|Published Time|Warning|Description|Image \d+)\s*:/i;
 
-請以 JSON 格式回應，不要任何其他說明：
-{
-  "promo": "簡潔列出所有促銷活動和優惠方案，用 | 分隔，每項不超過30字，無資訊則填「暫無活動」",
-  "time": "活動有效期限（如有），無則填「詳見官網」",
-  "location": "據點新增、展店、地址相關訊息，用 | 分隔，無則填「暫無異動」",
-  "summary": "一句話總結本月最重要的動態，不超過40字"
-}`;
-
-    const res = await fetch(CLAUDE_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: prompt }]
-        })
-    });
-    const data = await res.json();
-    const rawText = data.content?.[0]?.text || '{}';
-    try {
-        const clean = rawText.replace(/```json|```/g, '').trim();
-        return JSON.parse(clean);
-    } catch { return null; }
+/* 把一行再切成多個語意片段：
+   - 依 ### / ## / # 標題標記切
+   - 依「日期」出現位置切（jina 常把多筆活動壓成一行）
+   - 依 | 分隔符切 */
+function splitSegments(line){
+  let s = line.replace(/#{1,6}\s*/g, '\u0001');
+  // 在每個日期前插入分隔（保留日期本身）
+  s = s.replace(/(20\d{2}\s*[\/\-\.年]\s*\d{1,2}\s*[\/\-\.月]\s*\d{1,2}?\s*日?)/g, '\u0001$1');
+  s = s.replace(/\s*\|\s*/g, '\u0001');
+  return s.split('\u0001').map(x => x.trim()).filter(x => x.length > 0);
 }
 
-/* ── FETCH WITH TIMEOUT ── */
-function fetchWithTimeout(url, timeout = 10000) {
-    return Promise.race([
-        fetch(url),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-    ]);
-}
-
-/* ── PARSE HTML TO CLEAN TEXT ── */
-function parseHtml(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    ['script','style','nav','footer','header','aside','.menu','.nav'].forEach(sel => {
-        try { doc.querySelectorAll(sel).forEach(el => el.remove()); } catch(e){}
-    });
-    const text = doc.body?.innerText || '';
-    const lines = text.split(/[\n\r\t]/)
-        .map(l => l.trim())
-        .filter(l => l.length > 6 && /[\u4e00-\u9fa5]/.test(l));
-    return { raw: lines.slice(0, 100).join('\n'), fullText: text };
-}
-
-/* ── FETCH PAGE TEXT (多 proxy 輪替) ── */
-async function fetchPageText(url) {
-    let lastErr = null;
-
-    for (let i = 0; i < PROXIES.length; i++) {
-        const proxyUrl = PROXIES[i](url);
-        try {
-            const res = await fetchWithTimeout(proxyUrl, 12000);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            // allorigins & codetabs 回傳 JSON wrapper
-            const contentType = res.headers.get('content-type') || '';
-            if (contentType.includes('application/json') || proxyUrl.includes('allorigins') || proxyUrl.includes('codetabs')) {
-                const json = await res.json();
-                const html = json.contents || json.body || json.data || '';
-                if (!html || html.length < 100) throw new Error('empty response');
-                return parseHtml(html);
-            } else {
-                // thingproxy 直接回傳 HTML
-                const html = await res.text();
-                if (!html || html.length < 100) throw new Error('empty response');
-                return parseHtml(html);
-            }
-        } catch(e) {
-            lastErr = e;
-            console.warn(`Proxy ${i+1} failed for ${url}:`, e.message);
-            // 短暫等待再試下一個
-            await new Promise(r => setTimeout(r, 400));
-        }
+function cleanLines(md){
+  const out = [];
+  for(const rawLine of md.split('\n')){
+    let l = rawLine
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')        // 圖片
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')     // 連結 → 純文字
+      .replace(/\*\*|__|`/g, '')                   // 粗體 / 行內程式碼
+      .replace(/[\uE000-\uF8FF]/g, '')             // 私有區字元
+      .replace(/[\uD835][\uDC00-\uDFFF]/g, '')     // 數學粗體字母（𝕏 等）
+      .replace(/[（(]\s*[）)]/g, '')                // 空括號
+      .replace(/["'”’]\s*[)）]\s*$/, '')            // 殘留的 ") 結尾
+      .replace(/^[\s>*\-•·]+/, '')                 // 行首標記
+      .replace(/\s+/g, ' ')
+      .trim();
+    if(!l) continue;
+    if(META_RE.test(l)) continue;                  // 丟棄 jina metadata
+    for(const seg of splitSegments(l)){
+      const t = seg.replace(/^[\s>*\-•·]+/, '').replace(/\s+/g, ' ').trim();
+      if(t.length > 0) out.push(t);
     }
-    throw new Error(`所有 proxy 均失敗：${lastErr?.message}`);
+  }
+  return out;
 }
 
-/* ── SCAN ONE ── */
-async function scanOne(id, btn) {
-    const comp = competitors.find(c => c.id === id);
-    if (!comp) return;
-    const card = document.getElementById(`card-${id}`);
-    card.classList.add('scanning');
-    if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
-    document.getElementById(`${id}-ts`).textContent = '🔍 嘗試連線中...';
+function isNavLine(l){
+  if(NAV_RE.test(l)) return true;
+  // 純店名（如「松山店」「內湖旗艦一店」）且無數字 → 視為選單
+  if(l.length <= 10 && /(店|館|區|倉)$/.test(l) && !/\d/.test(l)) return true;
+  // 純英文短標籤
+  if(l.length <= 12 && /^[A-Za-z\s&\/]+$/.test(l)) return true;
+  // 選單被壓成一長串：長度中等、幾乎沒有標點與空格，且含多個選單詞
+  if(l.length >= 16 && !/[。，、；：！？,;!?]/.test(l) && !/\d/.test(l)
+     && /(首頁|選單|關於我們|聯絡我們|預約|常見問題|地點|價格|分店|櫃型|租倉|迷你倉)/.test(l.slice(0,40))) return true;
+  // 網站頁面標題（「XXX - YYY」形式且不含金額/折扣）
+  if(/^[^。]{4,40}\s[-–|]\s[^。]{2,40}$/.test(l) && !/[\d%$]/.test(l)) return true;
+  return false;
+}
 
-    try {
-        document.getElementById(`${id}-promo`).value = '';
-        const { raw, fullText } = await fetchPageText(comp.url);
-        document.getElementById(`${id}-raw`).value = raw.substring(0, 300);
-        document.getElementById(`${id}-ts`).textContent = '✅ 擷取成功，AI 分析中...';
+function normKey(s){
+  return s.replace(/[\s，,。、；;：:！!？?「」『』（）()\[\]【】\-—–_\/\\|]/g, '').toLowerCase();
+}
 
-        const ai = await claudeAnalyse(raw, comp.name);
-        const ts = new Date().toLocaleString('zh-TW');
+/* 從活動文字中剝除結尾日期，避免日期混進促銷欄 */
+function stripTrailingDate(s){
+  return s.replace(/\s*20\d{2}\s*[\/\-\.年]\s*\d{1,2}\s*[\/\-\.月]\s*\d{1,2}?\s*日?\s*$/, '')
+          .replace(/\s*[（(]\s*20\d{2}[^）)]*[）)]\s*$/, '')
+          .trim();
+}
 
-        if (ai) {
-            document.getElementById(`${id}-promo`).value = ai.promo || '';
-            document.getElementById(`${id}-time`).value = ai.time || '';
-            document.getElementById(`${id}-location`).value = ai.location || '';
-            document.getElementById(`${id}-ts`).textContent = '最後掃描：' + ts;
-            card.classList.remove('scanning', 'error');
-            card.classList.add('success');
-            autoSaveCard(id, ai, raw, ts);
-        } else {
-            fallbackParse(id, raw, ts);
-            card.classList.remove('scanning');
-            card.classList.add('success');
-        }
-    } catch (e) {
-        card.classList.remove('scanning');
-        card.classList.add('error');
-        document.getElementById(`${id}-promo`).value = `⚠ 擷取失敗：${e.message}\n\n💡 建議：直接點「官網」連結查看，或稍後重試。`;
-        document.getElementById(`${id}-ts`).textContent = '擷取失敗 ' + new Date().toLocaleTimeString('zh-TW');
+function extractPromos(lines){
+  const out = [];
+  const keys = [];
+  for(let raw of lines){
+    if(raw.length < 7) continue;
+    if(isNavLine(raw)) continue;
+    if(!PROMO_RE.test(raw)) continue;
+
+    // 剝除開頭的序號與結尾日期
+    let item = raw.replace(/^[0-9]{1,2}[\.、\)]\s*/, '').trim();
+    item = item.replace(/^20\d{2}\s*[\/\-\.年]\s*\d{1,2}\s*[\/\-\.月]\s*\d{1,2}\s*日?\s*/, '').trim();
+    item = stripTrailingDate(item);
+    item = item.replace(/^[（(]\s*\d+\s*[）)]\s*/, '').trim();
+    item = item.replace(/^[\.、,，。·•\s]+/, '').trim();
+    // 清掉殘留的引號括號與結尾分類標籤
+    item = item.replace(/["'”’]\s*[)）]/g, '').replace(/[（(]\s*["'“”]\s*/g, '').trim();
+    item = item.replace(/\s*(優惠活動|活動訊息|最新消息|最新優惠|倉庫優惠|特約優惠|官方公告|分店公告|消息情報|促銷活動|好康活動)(\s*-?\s*ALL)?\s*$/i, '').trim();
+    if(item.length < 7) continue;
+
+    const hasNum = /[\d]/.test(item);
+    const hasStrong = /(優惠|免費|送|回饋|限定|方案|折扣|特惠|好禮|促銷|開幕價|買一送一|免租|折價|下殺|降價)/.test(item);
+    if(!hasNum && !hasStrong) continue;
+
+    // 排除「整頁的標題／免責說明」：過長且無金額、無折扣數字
+    if(item.length > 55 && !/[\d]/.test(item)) continue;
+    // 排除純粹條款說明
+    if(/^(優惠只適用|本活動|折扣碼不|優惠不包|不能與|若要升級|預約時請)/.test(item)) continue;
+    // 排除 FAQ 問句（結尾為問號且無金額／折扣數字）
+    if(/[？?]\s*$/.test(item) && !/[0-9０-９]/.test(item)) continue;
+
+    const k = normKey(item);
+    if(k.length < 6) continue;
+
+    // 排除「純分類標籤」：本質是欄位名，不是活動內容
+    if(/^(優惠活動|活動訊息|最新消息|最新優惠|倉庫優惠|特約優惠|官方公告|分店公告|消息情報|促銷活動|好康活動)(-?ALL)?$/i.test(k)) continue;
+    // 排除「只有日期 + 分類」的殘骸（如「2026-10-30 優惠活動」）
+    if(/^20\d{2}[\d\-\/]*(優惠活動|活動訊息|最新消息)?$/.test(k)) continue;
+    // 排除頁面 H1：過長且含站名／品牌口號，又無明確數字優惠
+    if(item.length > 45 && !/[0-9０-９]/.test(item) && /(迷您倉庫|迷你倉庫|個人倉庫|收納|出租中|第一品牌)/.test(item)) continue;
+
+    // 與已收錄項目高度重複者略過（含子字串關係）
+    if(keys.some(prev => prev === k || prev.includes(k) || k.includes(prev))) continue;
+
+    keys.push(k);
+    out.push(item.length > 78 ? item.slice(0, 78) + '…' : item);
+    if(out.length >= 8) break;
+  }
+  return out;
+}
+
+/* 只在「活動相關行」中取日期：必須同時含促銷字或據點字，
+   避免把頁尾版權年、選單年份收進來 */
+function extractDates(lines){
+  const found = [];
+  const seen = new Set();
+  const pick = (l) => {
+    let m;
+    DATE_RE.lastIndex = 0;
+    while((m = DATE_RE.exec(l)) !== null){
+      const y = m[1], mo = String(m[2]).padStart(2,'0');
+      const d = m[3] ? String(m[3]).padStart(2,'0') : null;
+      const s = d ? `${y}-${mo}-${d}` : `${y}-${mo}`;
+      if(!seen.has(s)){ seen.add(s); found.push(s); }
+      if(found.length >= 4) return;
     }
-    if (btn) { btn.textContent = '⚡ 掃描'; btn.disabled = false; }
-    updateStats();
+  };
+
+  // 第一輪：明確含促銷／據點語意的行
+  for(const l of lines){
+    if(found.length >= 4) break;
+    if(isNavLine(l)) continue;
+    if(!PROMO_RE.test(l) && !LOC_RE.test(l)) continue;
+    if(!/20\d{2}/.test(l)) continue;
+    if(/^(Copyright|©)/i.test(l)) continue;
+    pick(l);
+  }
+  // 第二輪：任何含 20xx 且長度合理、非版權宣告的行
+  if(found.length === 0){
+    for(const l of lines){
+      if(found.length >= 4) break;
+      if(isNavLine(l)) continue;
+      if(!/20\d{2}/.test(l)) continue;
+      if(/^(Copyright|©)/i.test(l)) continue;
+      if(l.length < 8) continue;
+      pick(l);
+    }
+  }
+  // 第三輪：相對時間詞
+  if(found.length === 0){
+    for(const l of lines){
+      if(isNavLine(l)) continue;
+      const m = l.match(REL_RE);
+      if(m && PROMO_RE.test(l)){
+        const s = m[1];
+        if(!seen.has(s)){ seen.add(s); found.push(s); }
+        if(found.length >= 2) break;
+      }
+    }
+  }
+  return found;
 }
 
-/* ── FALLBACK PARSE (no Claude) ── */
-function fallbackParse(id, raw, ts) {
-    const lines = raw.split('\n');
-    const timeRegex = /(\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})|(\d{1,2}\/\d{1,2})|(即日起|至月底|年底前|限時)/g;
-    let pResults=[], tResults=[], lResults=[];
-    lines.forEach(line => {
-        const c = line.replace(/[•📍◎|]/g,'').substring(0,40);
-        if (/折|%|元|慶|優惠|方案|現折|折扣|首月|買一送一|免費|特惠|限定/.test(line)) {
-            pResults.push(c);
-            const m = line.match(timeRegex);
-            if (m) tResults.push(m[0]);
-        }
-        if (/開幕|據點|分店|進駐|門市|站|開幕|新址/.test(line)) lResults.push(c);
-    });
-    document.getElementById(`${id}-promo`).value = [...new Set(pResults)].slice(0,4).join(' | ') || '暫無活動資訊';
-    document.getElementById(`${id}-time`).value = [...new Set(tResults)].slice(0,2).join(', ') || '詳見官網';
-    document.getElementById(`${id}-location`).value = [...new Set(lResults)].slice(0,2).join(' | ') || '暫無異動';
-    document.getElementById(`${id}-ts`).textContent = '最後掃描：' + ts;
-    autoSaveCard(id, {}, raw, ts);
+function extractLocations(lines){
+  const out = [];
+  const seen = new Set();
+  for(let l of lines){
+    if(l.length < 6 || isNavLine(l)) continue;
+    if(!LOC_RE.test(l)) continue;
+    if(!/[\u4e00-\u9fff]/.test(l)) continue;
+    // 排除「活動標題」被誤判為展店：若同句含折扣/金額且非明確展店語，跳過
+    const isOpening = /(開幕|新開幕|新據點|新門市|進駐|新址|遷址|展店|旗艦店)/.test(l);
+    if(!isOpening && PROMO_RE.test(l)) continue;
+    // 剝除結尾日期與殘留標記
+    let item = stripTrailingDate(l)
+      .replace(/^[\d\s\.、\)\/]+/, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if(item.length < 6) continue;
+    // 排除以日期片段開頭、或中文佔比過低的殘骸
+    if(/^[\d\/\(\)（）~\-]+/.test(item)) continue;
+    const cn = (item.match(/[\u4e00-\u9fff]/g) || []).length;
+    if(cn < 4 || cn / item.length < 0.4) continue;
+    if(item.length > 70) item = item.slice(0, 70) + '…';
+    const k = normKey(item);
+    if(k.length < 6) continue;
+    if(seen.has(k)) continue;
+    seen.add(k);
+    out.push(item);
+    if(out.length >= 3) break;
+  }
+  return out;
 }
 
-function autoSaveCard(id, ai, raw, ts) {
-    const data = JSON.parse(localStorage.getItem('v12_comp_data') || '{}');
-    data[id] = {
-        promo: document.getElementById(`${id}-promo`).value,
-        time: document.getElementById(`${id}-time`).value,
-        location: document.getElementById(`${id}-location`).value,
-        raw: raw.substring(0,300),
-        ts
+function parseSite(md){
+  const lines = cleanLines(md);
+  const promos = extractPromos(lines);
+  const dates = extractDates(lines);
+  const locs = extractLocations(lines);
+  return {
+    promo: promos,
+    time: dates.join('、'),
+    location: locs,
+    raw: lines.slice(0, 120).join('\n')
+  };
+}
+
+/* ══════════════════════════════════════════════
+   掃描單站
+   ══════════════════════════════════════════════ */
+async function scanOne(id){
+  const comp = competitors.find(c => c.id === id);
+  if(!comp) return;
+
+  state[id] = Object.assign({}, state[id], { status:'run', err:'' });
+  renderRow(id);
+
+  try{
+    const md = await fetchSite(comp.url);
+    const parsed = parseSite(md);
+    const ts = new Date().toLocaleString('zh-TW', { hour12:false });
+
+    state[id] = {
+      status: parsed.promo.length > 0 ? 'ok' : 'part',
+      promo: parsed.promo,
+      time: parsed.time,
+      location: parsed.location,
+      raw: parsed.raw,
+      ts: ts,
+      err: ''
     };
-    localStorage.setItem('v12_comp_data', JSON.stringify(data));
+  }catch(e){
+    const msg = e.name === 'AbortError' ? '逾時（15 秒）'
+              : e.message === 'BLOCKED' ? '被防爬機制阻擋'
+              : e.message;
+    state[id] = Object.assign({}, state[id], {
+      status:'err',
+      err: msg,
+      ts: new Date().toLocaleString('zh-TW', { hour12:false })
+    });
+  }
+  persist();
+  renderRow(id);
+  updateStats();
 }
 
-/* ── SCAN ALL ── */
-async function scanAll() {
-    const btn = document.getElementById('btn-scan-all');
-    btn.disabled = true;
-    btn.textContent = '⏳ 掃描中...';
+/* ══════════════════════════════════════════════
+   全掃描（並行，限 6 條）
+   ══════════════════════════════════════════════ */
+async function scanAll(){
+  const btn = document.getElementById('btn-scan-all');
+  const list = visibleComps();
+  if(list.length === 0) return toast('目前篩選條件下沒有業者', 'err');
 
-    const visibleComps = currentRegion === 'all'
-        ? competitors
-        : competitors.filter(c => c.region === currentRegion || currentRegion === '全台' && c.region === '全台');
+  btn.disabled = true;
+  btn.textContent = '⏳ 掃描中…';
+  const wrap = document.getElementById('progress-wrap');
+  wrap.classList.add('show');
 
-    const wrap = document.getElementById('progress-wrap');
-    wrap.classList.add('show');
-    let done = 0;
+  let done = 0, cursor = 0;
+  const total = list.length;
+  const t0 = Date.now();
 
-    for (const comp of visibleComps) {
-        document.getElementById('progress-text').textContent = `正在掃描 ${comp.name}（${done+1}/${visibleComps.length}）...`;
-        document.getElementById('progress-fill').style.width = (done / visibleComps.length * 100) + '%';
-        await scanOne(comp.id, null);
-        done++;
-        await new Promise(r => setTimeout(r, 600)); // rate limit buffer
+  function tick(name){
+    done++;
+    document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
+    document.getElementById('progress-text').textContent =
+      `已完成 ${done}/${total}　·　剛完成：${name}`;
+  }
+
+  async function worker(){
+    while(cursor < list.length){
+      const comp = list[cursor++];
+      await scanOne(comp.id);
+      tick(comp.name);
     }
+  }
 
-    document.getElementById('progress-fill').style.width = '100%';
-    document.getElementById('progress-text').textContent = `✅ 全部掃描完成！共 ${done} 家業者`;
-    btn.disabled = false;
-    btn.textContent = '✨ 一鍵 AI 全掃描';
-    toast('✅ 掃描完成！', 'ok');
-    updateStats();
-    setTimeout(() => wrap.classList.remove('show'), 3000);
+  const n = Math.min(CONCURRENCY, list.length);
+  await Promise.allSettled(Array.from({ length:n }, worker));
+
+  const secs = ((Date.now() - t0) / 1000).toFixed(1);
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent =
+    `✅ 全部完成　共 ${total} 家　耗時 ${secs} 秒`;
+
+  btn.disabled = false;
+  btn.textContent = '✨ 一鍵全掃描';
+  toast(`✅ 掃描完成（${secs} 秒）`, 'ok');
+  updateStats();
+  setTimeout(() => wrap.classList.remove('show'), 4000);
 }
 
-/* ── ADD / REMOVE ── */
-function addNewComp() {
-    const name = document.getElementById('new-name').value.trim();
-    const url = document.getElementById('new-url').value.trim();
-    const region = document.getElementById('new-region').value;
-    if (!name || !url) return toast('請填寫名稱與網址', 'err');
-    if (!url.startsWith('http')) return toast('網址需以 http 開頭', 'err');
-    const id = 'c' + Date.now();
-    competitors.push({ name, url, id, region });
-    localStorage.setItem('v12_comp_list', JSON.stringify(competitors));
-    document.getElementById('new-name').value = '';
-    document.getElementById('new-url').value = '';
-    render();
-    toast(`已加入「${name}」`, 'ok');
+/* ══════════════════════════════════════════════
+   渲染
+   ══════════════════════════════════════════════ */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function removeComp(idx) {
-    if (!confirm('確定移除此業者追蹤？')) return;
-    competitors.splice(idx, 1);
-    localStorage.setItem('v12_comp_list', JSON.stringify(competitors));
-    render();
+function domainOf(url){
+  try{ return new URL(url).hostname.replace(/^www\./,''); }catch(e){ return url; }
 }
 
-/* ── SAVE ALL ── */
-function saveToLocal() {
-    const data = {};
-    competitors.forEach(comp => {
-        data[comp.id] = {
-            promo: document.getElementById(`${comp.id}-promo`)?.value || '',
-            time: document.getElementById(`${comp.id}-time`)?.value || '',
-            location: document.getElementById(`${comp.id}-location`)?.value || '',
-            raw: document.getElementById(`${comp.id}-raw`)?.value || '',
-            ts: document.getElementById(`${comp.id}-ts`)?.textContent?.replace('最後掃描：','') || ''
-        };
-    });
-    localStorage.setItem('v12_comp_data', JSON.stringify(data));
-    localStorage.setItem('v12_comp_list', JSON.stringify(competitors));
-    toast('💾 所有資料已儲存', 'ok');
+function statusBadge(st){
+  if(st === 'ok')   return '<span class="badge-st b-ok">成功</span>';
+  if(st === 'part') return '<span class="badge-st b-part">部分</span>';
+  if(st === 'err')  return '<span class="badge-st b-err">失敗</span>';
+  if(st === 'run')  return '<span class="badge-st b-run">掃描中</span>';
+  return '<span class="badge-st b-idle">未掃描</span>';
 }
 
-/* ── CLEAR ── */
-function clearAll() {
-    if (!confirm('確定清除所有掃描資料（業者名單保留）？')) return;
-    localStorage.removeItem('v12_comp_data');
-    render();
-    toast('🗑 資料已清除', 'info');
+function regionColor(r){
+  return { '北部':'#58a6ff','中部':'#3fb950','南部':'#f0883e','東部':'#bc8cff','全台':'#8b949e' }[r] || '#8b949e';
 }
 
-/* ── EXCEL EXPORT ── */
-function exportToExcel() {
-    const dateStr = new Date().toLocaleDateString('zh-TW');
-    let csv = '\ufeff業者名稱,服務區域,最新活動重點,有效期間,據點動態,原始片段,掃描時間\n';
-    competitors.forEach(comp => {
-        const f = id => (document.getElementById(`${comp.id}-${id}`)?.value || '').replace(/[\n\r]/g,' ').replace(/"/g,'""');
-        const ts = document.getElementById(`${comp.id}-ts`)?.textContent?.replace('最後掃描：','') || '';
-        csv += `${comp.name},${comp.region},"${f('promo')}","${f('time')}","${f('location')}","${f('raw').substring(0,80)}","${ts}"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `倉儲市場情報_${dateStr}.csv`;
-    a.click();
-    toast('📊 Excel 報表已下載', 'ok');
-}
-
-/* ── STATS ── */
-function updateStats() {
-    document.getElementById('stat-total').textContent = competitors.length;
-    const scanned = document.querySelectorAll('.card.success').length;
-    document.getElementById('stat-scanned').textContent = scanned;
-    let promos = 0;
-    competitors.forEach(c => {
-        const v = document.getElementById(`${c.id}-promo`)?.value || '';
-        if (v && v !== '暫無活動' && v !== '暫無活動資訊') promos++;
-    });
-    document.getElementById('stat-promos').textContent = promos;
-}
-
-/* ── TOAST ── */
-function toast(msg, type='info') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = `show ${type}`;
-    clearTimeout(el._t);
-    el._t = setTimeout(() => el.className = '', 3000);
-}
-
-/* ── MANUAL PASTE FALLBACK ── */
-function showPasteBox(id) {
-    const box = document.getElementById(`${id}-pastebox`);
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-}
-
-async function analyseManual(id) {
-    const comp = competitors.find(c => c.id === id);
-    const rawText = document.getElementById(`${id}-pasteraw`).value.trim();
-    if (!rawText || rawText.length < 20) return toast('請先貼上官網文字內容', 'err');
-
-    const card = document.getElementById(`card-${id}`);
-    card.classList.add('scanning');
-    document.getElementById(`${id}-promo`).value = '🤖 AI 分析中...';
-
-    const lines = rawText.split(/[\n\r\t]/).map(l=>l.trim()).filter(l=>l.length>6&&/[\u4e00-\u9fa5]/.test(l));
-    const cleanRaw = lines.slice(0,100).join('\n');
-    document.getElementById(`${id}-raw`).value = cleanRaw.substring(0,300);
-
-    const ai = await claudeAnalyse(cleanRaw, comp.name);
-    const ts = new Date().toLocaleString('zh-TW');
-    if (ai) {
-        document.getElementById(`${id}-promo`).value = ai.promo || '';
-        document.getElementById(`${id}-time`).value = ai.time || '';
-        document.getElementById(`${id}-location`).value = ai.location || '';
-        document.getElementById(`${id}-ts`).textContent = '最後掃描（手動）：' + ts;
-        card.classList.remove('scanning','error'); card.classList.add('success');
-        autoSaveCard(id, ai, cleanRaw, ts);
-        document.getElementById(`${id}-pastebox`).style.display = 'none';
-        toast(`✅ ${comp.name} 分析完成`, 'ok');
-    } else {
-        fallbackParse(id, cleanRaw, ts);
-        card.classList.remove('scanning'); card.classList.add('success');
+function visibleComps(){
+  return competitors.filter(c => {
+    if(currentRegion !== 'all'){
+      const cr = c.region || '全台';
+      if(currentRegion === '全台'){ if(cr !== '全台') return false; }
+      else if(cr !== currentRegion) return false;
     }
+    if(statusFilter !== 'all'){
+      const st = (state[c.id] && state[c.id].status) || 'idle';
+      if(statusFilter === 'ok'   && st !== 'ok')   return false;
+      if(statusFilter === 'part' && st !== 'part') return false;
+      if(statusFilter === 'err'  && st !== 'err')  return false;
+      if(statusFilter === 'idle' && st !== 'idle') return false;
+    }
+    if(searchTerm){
+      const d = state[c.id] || {};
+      const hay = [c.name, c.region, (d.promo||[]).join(' '), d.time||'', (d.location||[]).join(' ')]
+        .join(' ').toLowerCase();
+      if(!hay.includes(searchTerm.toLowerCase())) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  const tbody = document.getElementById('tbody');
+  const list = visibleComps();
+  tbody.innerHTML = '';
+
+  if(competitors.length === 0){
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><h3>尚無追蹤業者</h3><p>使用上方表單加入同業</p></div></td></tr>';
+    document.getElementById('row-count').textContent = '0';
     updateStats();
+    return;
+  }
+  if(list.length === 0){
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><h3>沒有符合條件的業者</h3><p>請調整搜尋或篩選條件</p></div></td></tr>';
+    document.getElementById('row-count').textContent = '0';
+    updateStats();
+    return;
+  }
+
+  list.forEach((comp, i) => {
+    const d = state[comp.id] || {};
+    const st = d.status || 'idle';
+    const idx = competitors.indexOf(comp);
+
+    const promoHtml = (d.promo && d.promo.length)
+      ? '<ul>' + d.promo.map(p => `<li>${esc(p)}</li>`).join('') + '</ul>'
+      : (st === 'err'
+          ? `<span style="color:var(--red);font-size:12.5px">⚠ ${esc(d.err || '擷取失敗')}</span>`
+          : '<span class="dash">—</span>');
+
+    const timeHtml = d.time ? esc(d.time) : '<span class="dash">—</span>';
+    const locHtml = (d.location && d.location.length)
+      ? d.location.map(l => esc(l)).join('<br>')
+      : '<span class="dash">—</span>';
+
+    const srcHtml = `${esc(domainOf(comp.url))}<br><span class="mono">${esc(d.ts || '尚未查詢')}</span>`;
+
+    const isOpen = expanded.has(comp.id);
+
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr class="data-row" id="row-${comp.id}">
+        <td class="c-idx">${i + 1}</td>
+        <td class="c-name">
+          <a href="${esc(comp.url)}" target="_blank" rel="noopener">${esc(comp.name)}</a>
+          <div class="sub">${esc(domainOf(comp.url))}</div>
+        </td>
+        <td><span class="tag-region" style="color:${regionColor(comp.region)};border-color:${regionColor(comp.region)}55">${esc(comp.region || '全台')}</span></td>
+        <td>${statusBadge(st)}</td>
+        <td class="c-promo">${promoHtml}</td>
+        <td class="c-time">${timeHtml}</td>
+        <td class="c-loc">${locHtml}</td>
+        <td class="c-src">${srcHtml}</td>
+        <td class="c-act">
+          <button class="btn-mini" onclick="rescan('${comp.id}')">重掃</button>
+          <button class="btn-mini" onclick="toggleDetail('${comp.id}')">${isOpen ? '收合' : '原文'}</button>
+          <button class="btn-mini danger" onclick="removeComp(${idx})">✕</button>
+        </td>
+      </tr>
+      <tr class="detail-row ${isOpen ? 'open' : ''}" id="detail-${comp.id}">
+        <td colspan="9">
+          <div class="detail-inner">
+            <h4>原始擷取片段（前 120 行，供核對）</h4>
+            <pre>${esc(d.raw || '（尚未擷取）')}</pre>
+          </div>
+        </td>
+      </tr>
+    `);
+  });
+
+  document.getElementById('row-count').textContent = String(list.length);
+  updateStats();
+}
+
+function renderRow(id){
+  // 單列更新：直接重繪整表較簡單且資料量小
+  render();
+}
+
+function toggleDetail(id){
+  if(expanded.has(id)) expanded.delete(id); else expanded.add(id);
+  const row = document.getElementById('detail-' + id);
+  if(row) row.classList.toggle('open', expanded.has(id));
+  const btn = document.querySelector(`#row-${id} .c-act button:nth-child(2)`);
+  if(btn) btn.textContent = expanded.has(id) ? '收合' : '原文';
+}
+
+async function rescan(id){
+  await scanOne(id);
+  toast('已重新掃描', 'ok');
+}
+
+/* ══════════════════════════════════════════════
+   篩選
+   ══════════════════════════════════════════════ */
+function filterRegion(r){
+  currentRegion = r;
+  document.querySelectorAll('.region-pill').forEach(p =>
+    p.classList.toggle('active', p.dataset.region === r));
+  document.getElementById('stat-region').textContent = r === 'all' ? '全部' : r;
+  render();
+}
+
+function onSearch(v){ searchTerm = v.trim(); render(); }
+function onStatusFilter(v){ statusFilter = v; render(); }
+
+/* ══════════════════════════════════════════════
+   新增 / 移除
+   ══════════════════════════════════════════════ */
+function addNewComp(){
+  const name = document.getElementById('new-name').value.trim();
+  const url  = document.getElementById('new-url').value.trim();
+  const region = document.getElementById('new-region').value;
+  if(!name || !url) return toast('請填寫名稱與網址', 'err');
+  if(!/^https?:\/\//.test(url)) return toast('網址需以 http 開頭', 'err');
+  const id = 'c' + Date.now();
+  competitors.push({ name, url, id, region });
+  localStorage.setItem(LS_LIST, JSON.stringify(competitors));
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-url').value = '';
+  render();
+  toast(`已加入「${name}」`, 'ok');
+}
+
+function removeComp(idx){
+  const comp = competitors[idx];
+  if(!comp) return;
+  if(!confirm(`確定移除「${comp.name}」？`)) return;
+  competitors.splice(idx, 1);
+  delete state[comp.id];
+  localStorage.setItem(LS_LIST, JSON.stringify(competitors));
+  persist();
+  render();
+  toast('已移除', 'info');
+}
+
+/* ══════════════════════════════════════════════
+   儲存 / 清除 / 匯出
+   ══════════════════════════════════════════════ */
+function persist(){
+  try{ localStorage.setItem(LS_DATA, JSON.stringify(state)); }catch(e){}
+}
+
+function saveToLocal(){
+  localStorage.setItem(LS_LIST, JSON.stringify(competitors));
+  persist();
+  toast('💾 所有資料已儲存', 'ok');
+}
+
+function clearAll(){
+  if(!confirm('確定清除所有掃描結果？（業者名單保留）')) return;
+  state = {};
+  localStorage.removeItem(LS_DATA);
+  render();
+  toast('🗑 資料已清除', 'info');
+}
+
+function exportToExcel(){
+  const dateStr = new Date().toLocaleDateString('zh-TW').replace(/\//g,'-');
+  const q = s => '"' + String(s == null ? '' : s).replace(/"/g,'""').replace(/[\r\n]+/g,' ') + '"';
+  let csv = '\ufeff業者名稱,服務區域,狀態,活動促銷重點,有效期限,據點動態,資料來源,查詢時間\n';
+  competitors.forEach(comp => {
+    const d = state[comp.id] || {};
+    const stTxt = { ok:'成功', part:'部分', err:'失敗', run:'掃描中' }[d.status] || '未掃描';
+    csv += [
+      q(comp.name), q(comp.region || '全台'), q(stTxt),
+      q((d.promo || []).join(' | ')),
+      q(d.time || ''),
+      q((d.location || []).join(' | ')),
+      q(domainOf(comp.url)),
+      q(d.ts || '')
+    ].join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `倉儲市場情報_${dateStr}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  toast('📊 Excel 報表已下載', 'ok');
+}
+
+/* ══════════════════════════════════════════════
+   統計 / Toast
+   ══════════════════════════════════════════════ */
+function updateStats(){
+  document.getElementById('stat-total').textContent = competitors.length;
+  let ok = 0, promos = 0;
+  competitors.forEach(c => {
+    const d = state[c.id];
+    if(!d) return;
+    if(d.status === 'ok' || d.status === 'part') ok++;
+    if(d.promo && d.promo.length) promos++;
+  });
+  document.getElementById('stat-scanned').textContent = ok;
+  document.getElementById('stat-promos').textContent = promos;
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + (type || 'info');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3000);
 }
 
 init();
